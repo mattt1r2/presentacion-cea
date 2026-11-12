@@ -10,6 +10,7 @@ const tasks = [
 const regions = ['Arica y Parinacota','Tarapacá','Antofagasta','Atacama','Coquimbo','Valparaíso','Metropolitana de Santiago','Libertador General Bernardo O’Higgins','Maule','Ñuble','Biobío','La Araucanía','Los Ríos','Los Lagos','Aysén','Magallanes'];
 const sample = { first:'Camila', last:'Ejemplo', email:'cliente@example.com', phone:'+56 9 0000 0000', address:'Calle de Ejemplo 123', city:'Talca', region:'Maule' };
 const minimum = 20000;
+const modeLabels = {minorista:'Al detalle', mayorista:'Mayorista'};
 const money = new Intl.NumberFormat('es-CL', {style:'currency', currency:'CLP'});
 const shop = document.querySelector('.store');
 const main = document.getElementById('store-main');
@@ -43,6 +44,7 @@ const addFeedbackTimers = new WeakMap();
 const currency = amount => money.format(amount);
 const getProduct = id => products.find(p => p.id === id);
 const upper = value => value[0].toUpperCase() + value.slice(1);
+const purchaseModeText = product => product.modes.map(mode => modeLabels[mode]).join(' · ');
 const normalize = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 const priceLabel = product => (product.formats.length > 1 ? 'Desde ' : '') + currency(product.formats[0][1]);
@@ -112,7 +114,7 @@ function renderShop() {
           <label class="search-label">Buscar producto <input class="input" type="search" data-search placeholder="Ej. detergente" value="${escapeHtml(state.query)}"></label>
           <div class="catalog-filters">
             ${filters('line','Línea',[['todos','Todas las líneas'],['automotriz','Automotriz'],['hogar','Hogar']])}
-            ${filters('mode','Tipo de compra',[['todos','Todos'],['minorista','Al detalle'],['mayorista','Por mayor']])}
+            ${filters('mode','Tipo de compra',[['todos','Todos'],...Object.entries(modeLabels)])}
           </div>
         </aside>
         <section class="catalog-zone" id="catalog-zone" aria-labelledby="catalog-title">
@@ -185,14 +187,14 @@ function renderProducts() {
       <a class="product-link" href="#producto/${p.slug}" data-action="product" data-id="${p.id}">
         <div class="product-picture">${productMedia(p)}</div>
         <div class="product-copy">
-          <span class="eyebrow">${upper(p.line)} · ${p.modes.map(upper).join(' y ')}</span>
+          <span class="eyebrow">${upper(p.line)} · ${purchaseModeText(p)}</span>
           <h3>${escapeHtml(p.name)}</h3>
           <span class="product-formats">${p.formats.map(([format]) => escapeHtml(format)).join(' · ')}</span>
           <p>${priceLabel(p)}</p>
         </div>
       </a>
       <div class="product-actions">
-        <button type="button" class="primary quick-add" data-action="quick-buy" data-id="${p.id}" aria-haspopup="dialog" aria-label="Agregar ${escapeHtml(p.name)}, ${p.mode === 'mayorista' ? 'por mayor' : 'al detalle'}"><span data-add-label="Agregar">Agregar</span><span aria-hidden="true" data-add-icon="+">+</span></button>
+        <button type="button" class="primary quick-add" data-action="quick-buy" data-id="${p.id}" aria-haspopup="dialog" aria-label="Agregar ${escapeHtml(p.name)}, ${purchaseModeText(p)}"><span data-add-label="Agregar">Agregar</span><span aria-hidden="true" data-add-icon="+">+</span></button>
       </div>
     </article>`).join('') : '<p class="empty">No hay productos para esta búsqueda. Prueba con otro nombre o filtro.</p>';
 }
@@ -315,7 +317,7 @@ function renderDetail() {
       <div class="product-view">
         <figure class="detail-photo">${productMedia(p, p.name)}</figure>
         <div>
-          <span class="eyebrow">${upper(p.line)} · ${p.modes.map(upper).join(' y ')}</span>
+          <span class="eyebrow">${upper(p.line)} · ${purchaseModeText(p)}</span>
           <h1 class="view-title" tabindex="-1">${escapeHtml(p.name)}</h1>
           ${p.description ? `<p class="description">${escapeHtml(p.description)}</p>` : ''}
           <p class="detail-price" data-price>${currency(price)}</p>
@@ -574,7 +576,7 @@ function openQuickBuy(id, source) {
     <div class="quick-dialog-content">
       <figure class="quick-product-photo">${productMedia(product, product.name)}</figure>
       <div class="quick-product-body">
-        <span class="eyebrow">${upper(product.line)} · ${product.modes.map(upper).join(' y ')}</span>
+        <span class="eyebrow">${upper(product.line)} · ${purchaseModeText(product)}</span>
         <h2 id="quick-buy-title">${escapeHtml(product.name)}</h2>
         <label>Presentación<select class="input" data-quick-format>${product.formats.map(([format, price], index) =>
           `<option value="${index}">${escapeHtml(format)} · ${currency(price)}</option>`).join('')}</select></label>
