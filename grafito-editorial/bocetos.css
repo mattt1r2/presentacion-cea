@@ -1,0 +1,183 @@
+html[data-theme=grafito] { background:#171c18; }
+.store[data-theme=grafito] {
+  --ink:#171c18;
+  --soft-ink:#485248;
+  --bg:#f5f3e9;
+  --paper:#fffdf6;
+  --line:#ccd3c5;
+  --accent:#244b35;
+  --tint:#e7edd8;
+  --deep:#171c18;
+}
+[data-theme=grafito] .site-header,
+[data-theme=grafito] .home-hero,
+[data-theme=grafito] .site-footer { background:#171c18; color:#f5f3e9; }
+[data-theme=grafito] .site-header { border-color:#414e40; }
+[data-theme=grafito] :is(.site-header,.home-hero,.site-footer) :focus-visible { outline-color:var(--cea-lime); }
+[data-theme=grafito] .site-nav nav a { color:#dbe3d5; }
+[data-theme=grafito] .site-nav nav a:is(:hover,[aria-current]) { color:#f7f8eb; }
+[data-theme=grafito] .site-nav nav::after { background:var(--cea-lime); }
+.cea-site[data-theme=grafito][data-view=home] .site-nav nav [data-nav=tienda] { color:#171c18; background:var(--cea-lime); }
+.cea-site[data-theme=grafito][data-view=home] .site-nav nav [data-nav=tienda]:hover { background:#c3df5f; }
+[data-theme=grafito] .site-cart { border-color:#657260; }
+[data-theme=grafito] .site-cart:is(:hover,[aria-expanded=true]) { border-color:var(--cea-lime); background:#2c362a; }
+[data-theme=grafito] .site-cart span { color:#171c18; background:var(--cea-lime); }
+[data-theme=grafito] .home-hero { position:relative; isolation:isolate; overflow:hidden; }
+[data-theme=grafito] .hero-shell {
+  display:grid;
+  gap:clamp(15px,2.15vw,28px);
+  padding-block:clamp(22px,3vw,38px) clamp(14px,2.2vw,28px);
+}
+[data-theme=grafito] .hero-copy { width:100%; margin:0; text-align:center; }
+[data-theme=grafito] .hero-kicker {
+  justify-content:center;
+  gap:10px;
+  color:#d9e7b1;
+  font-size:11px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+[data-theme=grafito] .hero-kicker span,
+[data-theme=grafito] .hero-kicker::after {
+  width:clamp(14px,2.5vw,34px);
+  height:1px;
+  background:var(--cea-lime);
+}
+[data-theme=grafito] .hero-kicker::after { content:""; }
+[data-theme=grafito] .hero-copy h1 {
+  max-width:none;
+  margin:10px 0 11px;
+  color:#f4f2e7;
+  font:800 clamp(39px,5.6vw,81px)/.98 var(--heading);
+  letter-spacing:-.06em;
+  text-wrap:balance;
+}
+[data-theme=grafito] .hero-copy h1 em { color:var(--cea-lime); white-space:nowrap; }
+[data-theme=grafito] .hero-copy > p:not(.hero-kicker) { max-width:75ch; margin-inline:auto; color:#d9e2d6; }
+[data-theme=grafito] .hero-description span { color:#f5f3e9; font-weight:650; }
+[data-theme=grafito] .hero-actions { justify-content:center; margin-top:15px; }
+.store[data-theme=grafito] .hero-actions .primary { border-color:var(--cea-lime); background:var(--cea-lime); color:#171c18; min-height:52px; gap:clamp(10px,1.5vw,23px); }
+.store[data-theme=grafito] .hero-actions .primary:hover { border-color:#c3df5f; background:#c3df5f; filter:none; }
+[data-theme=grafito] .hero-story { display:inline-flex; align-items:center; min-height:44px; color:#eff1df; }
+[data-theme=grafito] .hero-story:hover { color:var(--cea-lime); }
+[data-theme=grafito] .hero-visual {
+  --hero-photo-height:clamp(238px,30vw,426px);
+  position:relative;
+  display:block;
+  height:auto;
+  min-width:0;
+  margin:0;
+  border:1px solid #3e4a3d;
+  border-radius:2px;
+  background:#222d24;
+}
+[data-theme=grafito] .hero-artwork {
+  position:relative;
+  width:100%;
+  height:var(--hero-photo-height);
+  overflow:hidden;
+  background:radial-gradient(ellipse at 50% 67%,#29382e 0%,#222d24 54%,#1b251d 100%);
+}
+[data-theme=grafito] .hero-image {
+  position:absolute;
+  inset:-8.5% auto auto 50%;
+  width:calc(var(--hero-photo-height) * 1.68);
+  max-width:none;
+  height:112%;
+  object-fit:contain;
+  object-position:center;
+  transform:translateX(-67%);
+  mask-image:linear-gradient(90deg,transparent 12%,#000 34% 96%,transparent),
+    linear-gradient(180deg,transparent,#000 8% 97%,transparent);
+  mask-composite:intersect;
+}
+[data-theme=grafito] .hero-caption {
+  position:absolute;
+  inset:auto clamp(12px,3.6vw,49px) clamp(12px,2.6vw,34px) auto;
+  z-index:1;
+}
+[data-theme=grafito] .hero-product {
+  position:relative;
+  inset:auto;
+  color:#f4f5e8;
+  border-color:#687563;
+  border-inline-start:3px solid var(--cea-lime);
+  background:#171c18;
+}
+[data-theme=grafito] .hero-product:hover { border-color:var(--cea-lime); background:#262f24; }
+[data-theme=grafito] .hero-product small { color:#cdd5c6; }
+[data-theme=grafito] .hero-product > span:last-child { color:#cfdf9c; }
+[data-theme=grafito] .landing-shop-cta { background:#dce8bc; color:#213620; }
+[data-theme=grafito] .landing-shop-cta h2 { font-family:"Barlow Condensed","Instrument Sans",sans-serif; text-transform:uppercase; }
+[data-theme=grafito] .landing-shop-cta .primary { min-width:155px; justify-content:space-between; background:#263c2a; border-color:#263c2a; }
+[data-theme=grafito] .cart-toast { background:#263c2a; border-color:#839677; }
+[data-theme=grafito] .cart-toast a { color:#dde9b8; }
+[data-theme=grafito] .site-footer { border-color:#414e40; }
+[data-theme=grafito] .site-footer h2 { color:#dfe8c4; }
+[data-theme=grafito] .footer-webpay span { color:#dfe8c4; }
+[data-theme=grafito] :is(.footer-webpay,.servimat-credit,.footer-bottom) { border-color:#596754; }
+[data-theme=grafito] .servimat-credit:hover { background:#2e3a2c; }
+[data-theme=grafito] .servimat-credit span:last-child { color:var(--cea-lime); }
+
+@media(min-width:1000px) {
+  .store .shop-screen .shop-banner-inner { padding-block:13px 13px; }
+  .store .shop-screen.layout-facets .shop-composition { padding-top:17px; }
+}
+@media(min-width:1100px) {
+  [data-theme=grafito] .hero-caption::before {
+    position:absolute;
+    inset:50% 100% auto auto;
+    width:clamp(36px,calc(34vw - 335px),145px);
+    height:1px;
+    background:#899778;
+    content:"";
+  }
+}
+@media(min-width:681px) and (max-width:960px) {
+  [data-theme=grafito] .site-nav { padding-inline:clamp(14px,1.8vw,22px); }
+}
+@media(max-width:820px) {
+  [data-theme=grafito] .hero-visual { --hero-photo-height:clamp(188px,49vw,295px); }
+  [data-theme=grafito] .hero-caption { position:relative; inset:auto; margin:0 8px 8px; }
+  [data-theme=grafito] .hero-product { justify-content:space-between; margin:0; padding:8px 10px; }
+}
+@media(max-width:680px) {
+  [data-theme=grafito] .site-nav nav { border-top-color:#414e40; }
+  [data-theme=grafito] .hero-shell { padding-block:19px 13px; }
+  [data-theme=grafito] .hero-copy h1 { font-size:clamp(30px,7.35vw,48px); margin-block:8px 10px; }
+  [data-theme=grafito] .hero-copy h1 span { display:block; }
+  [data-theme=grafito] .hero-copy > p:not(.hero-kicker) { font-size:14px; }
+  [data-theme=grafito] .hero-description span { display:block; margin-top:3px; }
+  [data-theme=grafito] .hero-actions { gap:4px 13px; margin-top:11px; }
+  .store[data-theme=grafito] .hero-actions .primary { min-height:46px; }
+  [data-theme=grafito] .hero-story { min-height:40px; }
+}
+@media(prefers-reduced-motion:no-preference) {
+  [data-theme=grafito] .hero-image { animation:cea-grafito-image .64s ease-out both; }
+  [data-theme=grafito] .landing-revealed { animation:cea-grafito-rise .48s cubic-bezier(.2,.65,.24,1) both; }
+  [data-theme=grafito] :is(.site-cart,.hero-actions a,.hero-product,.landing-shop-cta a,.servimat-credit) {
+    transition:background-color .18s ease, border-color .18s ease, color .18s ease;
+  }
+  [data-theme=grafito] :is(.hero-product,.landing-shop-cta a,.servimat-credit) > span[aria-hidden] {
+    transition:transform .18s ease;
+  }
+  [data-theme=grafito] :is(.hero-product,.servimat-credit):hover > span[aria-hidden] { transform:translate(2px,-2px); }
+  [data-theme=grafito] .landing-shop-cta a:hover > span[aria-hidden] { transform:translateX(3px); }
+  .shop-banner-inner { animation:cea-appear .28s ease-out both; }
+  .quick-dialog[open] { animation:cea-appear .22s ease-out both; }
+  .hero-actions a span { display:inline-block; transition:transform .18s ease; }
+  .hero-actions .primary:hover span { transform:translateX(3px); }
+  .hero-actions .hero-story:hover span { transform:translateY(3px); }
+}
+@keyframes cea-appear {
+  from { opacity:.25; transform:translateY(9px); }
+  to { opacity:1; transform:translateY(0); }
+}
+@keyframes cea-grafito-rise {
+  from { opacity:.72; transform:translateY(8px); }
+  to { opacity:1; transform:translateY(0); }
+}
+@keyframes cea-grafito-image {
+  from { opacity:.65; translate:0 8px; }
+  to { opacity:1; translate:0; }
+}
