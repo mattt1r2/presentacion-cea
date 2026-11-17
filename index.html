@@ -1,123 +1,240 @@
 <!doctype html>
-<html lang="es-CL">
+<html lang="es-CL" data-theme="grafito">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Distribuidora CEA. Fabricamos detergentes en polvo y gel y distribuimos productos de limpieza para el hogar y el auto. Venta al detalle y por mayor.">
   <meta name="robots" content="noindex">
-  <title>Distribuidora CEA · Propuestas web</title>
-  <link rel="icon" href="grafito/assets/logo.webp" type="image/webp">
-  <style>
-    @font-face {
-      font-family:"Barlow Condensed";
-      src:url("grafito/assets/barlow-condensed-800.woff2") format("woff2");
-      font-weight:800;
-      font-display:swap;
-    }
-    :root {
-      color-scheme:light;
-      font:16px/1.5 "Segoe UI",sans-serif;
-      --graphite:#171c18;
-      --lime:#b7d649;
-      --paper:#f4f2e9;
-      --rule:#cdd1c4;
-      --muted:#52604e;
-      color:var(--graphite);
-      background:var(--paper);
-    }
-    * { box-sizing:border-box; }
-    body,h1,h2,p { margin:0; }
-    a { color:inherit; }
-    button { font:inherit; cursor:pointer; }
-    img { display:block; max-width:100%; }
-    :focus-visible { outline:2px solid #5b7127; outline-offset:3px; }
-    .shell { width:min(100%,1440px); margin-inline:auto; padding-inline:clamp(16px,4.5vw,70px); }
-    .masthead { color:#f5f3e9; background:var(--graphite); border-bottom:3px solid var(--lime); }
-    .masthead .shell { padding-block:clamp(16px,1.8vw,22px); }
-    .brand { display:flex; align-items:center; gap:10px; font-size:.95rem; font-weight:700; }
-    .brand img { width:36px; height:36px; object-fit:contain; }
-    h1,h2 { font-family:"Barlow Condensed","Segoe UI",sans-serif; font-weight:800; letter-spacing:-.015em; }
-    h1 { margin-top:8px; font-size:clamp(36px,4.5vw,56px); line-height:.97; text-wrap:balance; }
-    main { padding-block:clamp(15px,2vw,22px) clamp(24px,3vw,36px); }
-    .comparison-bar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px 16px; margin-bottom:clamp(12px,2vw,22px); }
-    .comparison-bar h2 { font-size:clamp(23px,3vw,36px); line-height:1.1; }
-    .scenes { display:flex; flex-wrap:wrap; gap:4px; }
-    .scenes button { min-height:44px; padding:6px clamp(9px,1.25vw,16px); border:1px solid var(--rule); border-radius:2px; background:transparent; color:var(--graphite); font-size:.875rem; font-weight:650; }
-    .scenes button:hover { background:#e7ebdc; }
-    .scenes [aria-pressed="true"] { background:#dce9ad; border-color:#76864f; box-shadow:inset 0 -2px #76864f; }
-    .proposals { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(13px,2vw,28px); }
-    .proposal { display:flex; min-width:0; flex-direction:column; border:1px solid var(--rule); background:#fbfaf3; }
-    .proposal-header { padding:clamp(12px,1.5vw,19px); }
-    .proposal-header p { color:var(--muted); font-size:.8rem; font-weight:700; }
-    .proposal h3 { margin:2px 0 0; font:800 clamp(30px,3.6vw,46px)/.97 "Barlow Condensed","Segoe UI",sans-serif; letter-spacing:-.01em; }
-    .preview { display:grid; place-items:center; aspect-ratio:1366/880; overflow:hidden; background:#222b23; border-block:1px solid var(--rule); }
-    .preview:focus-visible { outline-offset:-4px; outline-color:var(--lime); }
-    .preview img { width:100%; height:100%; object-fit:contain; }
-    [data-scene="movil"] .preview { aspect-ratio:auto; padding:clamp(10px,2vw,22px); }
-    [data-scene="movil"] .preview img { width:min(100%,310px); height:auto; }
-    .proposal-info { display:flex; flex-direction:column; align-items:flex-start; gap:14px; flex:1; padding:clamp(12px,2vw,24px); }
-    .proposal-info p { max-width:45ch; }
-    .proposal-actions { display:flex; align-items:center; flex-wrap:wrap; gap:7px 15px; margin-top:auto; }
-    .open-site { display:inline-flex; align-items:center; gap:9px; min-height:44px; padding:8px 12px; border:1px solid var(--graphite); border-radius:2px; background:var(--graphite); color:#f5f3e9; text-decoration:none; font-size:.875rem; font-weight:700; }
-    .open-site:hover { background:#303d29; }
-    .demo-note { margin-top:18px; color:var(--muted); font-size:.875rem; }
-    @media (max-width:680px) {
-      .proposals { grid-template-columns:1fr; }
-      .comparison-bar { align-items:flex-start; flex-direction:column; }
-    }
-  </style>
-  <script defer src="presentacion.js"></script>
+  <meta name="theme-color" content="#171c18">
+  <title>Distribuidora CEA · Fabricación propia</title>
+  <link rel="icon" href="assets/logo.webp" type="image/webp">
+  <link rel="stylesheet" href="site.css">
+  <link rel="stylesheet" href="shop-base.css">
+  <link rel="stylesheet" href="sections.css">
+  <link rel="stylesheet" href="commerce.css">
+  <link rel="stylesheet" href="grafito.css">
+  <script src="catalog.js" defer></script>
+  <script src="promotion-pricing.js" defer></script>
+  <script src="storefront.js" defer></script>
+  <script src="promotions.js" defer></script>
 </head>
 <body>
-  <header class="masthead">
-    <div class="shell">
-      <p class="brand"><img src="grafito/assets/logo.webp" alt="" width="36" height="36">Distribuidora CEA</p>
-      <h1>Dos propuestas web</h1>
-    </div>
-  </header>
-  <main class="shell">
-    <div class="comparison-bar">
-      <h2>Comparar las versiones</h2>
-      <div class="scenes" role="group" aria-label="Pantalla para comparar">
-        <button type="button" data-scene="inicio" aria-pressed="true">Inicio</button>
-        <button type="button" data-scene="empresa" aria-pressed="false">Empresa</button>
-        <button type="button" data-scene="tienda" aria-pressed="false">Tienda</button>
-        <button type="button" data-scene="carrito" aria-pressed="false">Carrito</button>
-        <button type="button" data-scene="movil" aria-pressed="false">Móvil</button>
+  <a class="skip-link" href="#store-main">Saltar al contenido</a>
+  <div class="store cea-site" data-view="home" data-theme="grafito">
+    <header class="site-header">
+      <div class="shell site-nav">
+        <a href="#inicio" class="site-brand" data-action="home" aria-label="Distribuidora CEA, inicio">
+          <img src="assets/logo.webp" alt="" width="42" height="42">
+          <span>Distribuidora <strong>CEA</strong></span>
+        </a>
+        <nav aria-label="Navegación principal">
+          <a href="#inicio" data-action="home" data-nav="inicio" aria-current="page">Inicio</a>
+          <a href="#empresa" data-action="section" data-section="empresa" data-nav="empresa">Empresa</a>
+          <a href="#tienda" data-action="catalog" data-line="todos" data-nav="tienda">Tienda</a>
+          <a href="#contacto" data-action="section" data-section="contacto" data-nav="contacto">Contacto</a>
+        </nav>
+        <a href="#carrito" class="site-cart" data-action="cart" aria-haspopup="dialog" aria-controls="cart-drawer" aria-expanded="false" hidden>Carrito <span data-count>0</span></a>
+      </div>
+    </header>
+    <main id="store-main" tabindex="-1">
+      <section class="home-hero" aria-labelledby="hero-title">
+        <div class="shell hero-shell">
+          <div class="hero-copy">
+            <p class="hero-kicker"><span></span>Fabricación propia</p>
+            <h1 id="hero-title" tabindex="-1"><span>Fabricamos nuestros</span> <em>detergentes</em></h1>
+            <p class="hero-description">Detergentes en polvo y gel para la ropa. Distribuimos productos de limpieza para el hogar y el auto. <span>Venta al detalle y por mayor.</span></p>
+            <div class="hero-actions">
+              <a class="primary" href="#tienda" data-action="catalog" data-line="todos">Comprar en la tienda <span aria-hidden="true">→</span></a>
+              <a class="hero-story" href="#promociones" data-action="section" data-section="promociones">Ver promociones <span aria-hidden="true">↓</span></a>
+            </div>
+          </div>
+          <figure class="hero-visual">
+            <div class="hero-artwork">
+              <img class="hero-image" src="assets/cea-matic-estudio.webp" alt="Tres bidones de detergente Matic CEA" fetchpriority="high" width="1536" height="1024">
+            </div>
+            <figcaption class="hero-caption">
+              <a class="hero-product" href="#producto/detergente-liquido-matic" data-action="product" data-id="detergente">
+                <span><strong>Detergente en gel</strong><small>Ver oferta de 5 L</small></span><span aria-hidden="true">↗</span>
+              </a>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+      <section class="home-promotions" id="promociones" aria-labelledby="promotions-title" aria-roledescription="carrusel">
+        <div class="shell promotions-shell">
+          <div class="promotions-heading">
+            <h2 id="promotions-title">Promociones</h2>
+            <a href="#tienda" data-action="catalog" data-line="promociones">Ver ofertas en tienda <span aria-hidden="true">↗</span></a>
+          </div>
+          <div class="promotions-stage">
+            <div class="promotions-frame">
+              <a class="promotion-slide is-active" href="#producto/detergente-liquido-matic/pack" data-action="product" data-id="detergente" data-format="2">
+                <img src="assets/cea-promocion-1.webp" width="1141" height="1250" loading="lazy" decoding="async" alt="Aviso CEA. Pack de 4 bidones de detergente en gel de 5 litros cada uno por $10.000.">
+              </a>
+              <a class="promotion-slide" href="#producto/detergente-en-polvo-25-kg" data-action="product" data-id="polvo" hidden>
+                <img src="assets/cea-promocion-2.webp" width="1250" height="833" loading="lazy" decoding="async" alt="Aviso CEA. Detergente en polvo de 25 kilos por $32.000.">
+              </a>
+              <a class="promotion-slide" href="#tienda" data-action="catalog" data-line="promociones" hidden>
+                <img src="assets/cea-promocion-3.webp" width="833" height="1250" loading="lazy" decoding="async" alt="Aviso CEA. Desde 12 unidades: detergente en gel de 5 litros a $1.500 c/u, limpiapisos de 5 litros a $1.290 c/u, limpiatapiz de 1 litro a $1.200 c/u y detergente en polvo de 25 kilos a $27.500 c/u.">
+              </a>
+              <a class="promotion-slide" href="#producto/detergente-en-polvo-25-kg" data-action="product" data-id="polvo" hidden>
+                <img src="assets/cea-promocion-4.webp" width="1250" height="1250" loading="lazy" decoding="async" alt="Aviso CEA. Saco de detergente en polvo de 25 kilos: a partir de 6 unidades, $29.500 cada uno; de 12 unidades, $27.500 cada uno; de 30 unidades, $25.000 cada uno.">
+              </a>
+            </div>
+            <div class="promotions-indicator" aria-hidden="true">
+              <span class="promotions-position">1 / 4</span>
+              <span class="promotions-progress"><span class="is-current"></span><span></span><span></span><span></span></span>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="home-use" id="por-uso" aria-labelledby="home-use-title" hidden>
+        <div class="shell home-use-layout">
+          <div class="home-use-controls">
+            <h2 id="home-use-title">¿Qué vas a limpiar?</h2>
+            <div class="home-use-options" data-home-use-options role="group" aria-label="Elegir qué vas a limpiar"></div>
+          </div>
+          <div class="use-result" aria-live="polite" aria-atomic="true"></div>
+        </div>
+      </section>
+      <section class="cea-landing-section cea-story" id="empresa" aria-labelledby="cea-story-title">
+  <div class="shell cea-story-layout">
+    <div class="cea-story-copy">
+      <p class="cea-section-label">Desde 2018 · Talca</p>
+      <h2 id="cea-story-title">Una empresa <em>familiar</em></h2>
+      <p>CEA nació con la idea de crear productos propios y abrir oportunidades a emprendedores independientes. Fabricamos detergentes y distribuimos productos de limpieza para el hogar y el auto.</p>
+      <div class="cea-story-actions">
+        <a class="primary cea-story-shop" href="#tienda" data-action="catalog" data-line="todos">Ver catálogo <span aria-hidden="true">↗</span></a>
+        <a class="cea-story-lines" href="#lineas" data-action="section" data-section="lineas">Conoce nuestras líneas <span aria-hidden="true">↓</span></a>
       </div>
     </div>
-    <div class="proposals" data-scene="inicio">
-      <article class="proposal" data-version="grafito" aria-labelledby="grafito-title">
-        <header class="proposal-header">
-          <p>Primera versión publicada</p>
-          <h3 id="grafito-title">Grafito</h3>
-        </header>
-        <a class="preview" href="capturas/grafito-inicio.jpg" target="_blank" rel="noopener" aria-label="Ampliar Inicio de Grafito">
-          <img src="capturas/grafito-inicio.jpg" alt="Portada con titular a la izquierda y bidones de detergente a la derecha" width="1366" height="880">
-        </a>
-        <div class="proposal-info">
-          <p>Portada dividida con accesos directos a Empresa y Tienda. El selector por uso está dentro de la tienda.</p>
-          <div class="proposal-actions">
-            <a class="open-site" href="grafito/index.html" target="_blank" rel="noopener" aria-label="Explorar el boceto Grafito">Explorar boceto <span aria-hidden="true">↗</span></a>
-          </div>
+    <div class="cea-story-visuals">
+      <figure class="cea-story-figure">
+        <div class="cea-story-image">
+          <img src="assets/exhibicion-cea.webp" alt="Botellas de productos CEA en un estante" loading="lazy" width="360" height="640">
         </div>
+        <figcaption>Productos CEA en exhibición</figcaption>
+      </figure>
+      <figure class="cea-story-figure cea-story-product">
+        <div class="cea-story-image">
+          <img src="assets/producto-573.webp" alt="Bidones azules con la etiqueta de Detergente Matic CEA" loading="lazy" width="584" height="780">
+        </div>
+        <figcaption><a href="#producto/detergente-liquido-matic" data-action="product" data-id="detergente">Detergente Matic en gel · 5 L <span aria-hidden="true">↗</span></a></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="cea-landing-section cea-lines" id="lineas" aria-labelledby="cea-lines-title">
+  <div class="shell cea-lines-layout">
+    <div class="cea-lines-heading">
+      <h2 id="cea-lines-title">Para el hogar y <em>el auto</em></h2>
+    </div>
+    <div class="cea-lines-spread">
+      <article class="cea-line cea-line-hogar">
+        <a class="cea-line-link" href="#tienda" data-action="catalog" data-line="hogar">
+          <div class="cea-line-image">
+            <img src="assets/producto-565.webp" alt="" loading="lazy">
+          </div>
+          <div class="cea-line-copy">
+            <h3>Hogar</h3>
+            <p>Detergentes en polvo y gel, lavalozas y limpiapisos.</p>
+            <span class="cea-line-action">Ver línea hogar <span aria-hidden="true">↗</span></span>
+          </div>
+        </a>
+        <a class="cea-line-highlight" href="#producto/limpia-pisos" data-action="product" data-id="pisos">Limpiapisos de 5 L <span aria-hidden="true">↗</span></a>
       </article>
-      <article class="proposal" data-version="grafito-editorial" aria-labelledby="editorial-title">
-        <header class="proposal-header">
-          <p>Propuesta actualizada</p>
-          <h3 id="editorial-title">Grafito editorial</h3>
-        </header>
-        <a class="preview" href="capturas/grafito-editorial-inicio.jpg" target="_blank" rel="noopener" aria-label="Ampliar Inicio de Grafito editorial">
-          <img src="capturas/grafito-editorial-inicio.jpg" alt="Portada con titular centrado y una foto panorámica de los bidones debajo" width="1366" height="880">
-        </a>
-        <div class="proposal-info">
-          <p>Portada panorámica, selector por uso en Inicio y confirmación al agregar productos al carrito.</p>
-          <div class="proposal-actions">
-            <a class="open-site" href="grafito-editorial/index.html" target="_blank" rel="noopener" aria-label="Explorar el boceto Grafito editorial">Explorar boceto <span aria-hidden="true">↗</span></a>
+      <article class="cea-line cea-line-automotriz">
+        <a class="cea-line-link" href="#tienda" data-action="catalog" data-line="automotriz">
+          <div class="cea-line-image">
+            <img src="assets/shampoo.webp" alt="" loading="lazy">
           </div>
-        </div>
+          <div class="cea-line-copy">
+            <h3>Automotriz</h3>
+            <p>Shampoo para autos, limpiador de llantas y limpiatapiz.</p>
+            <span class="cea-line-action">Ver línea automotriz <span aria-hidden="true">↗</span></span>
+          </div>
+        </a>
       </article>
     </div>
-    <p class="demo-note">Ambos bocetos incluyen el catálogo, el carrito lateral y una compra de demostración con Webpay.</p>
-  </main>
+  </div>
+</section>
+
+<section class="cea-landing-section cea-bulk" id="granel" aria-labelledby="cea-bulk-title">
+  <div class="shell cea-bulk-layout">
+    <div class="cea-bulk-copy">
+      <h2 id="cea-bulk-title">Detergente <span>a granel</span></h2>
+      <p>Escríbenos para consultar formatos disponibles y condiciones de venta por mayor.</p>
+    </div>
+    <div class="cea-bulk-links">
+      <a href="mailto:contacto@distribuidoracea.cl?subject=Consulta%20por%20detergente%20a%20granel">
+        <span><strong>Consultar por correo</strong><span>contacto@distribuidoracea.cl</span></span>
+        <span aria-hidden="true">↗</span>
+      </a>
+      <a href="https://www.instagram.com/distribuidoracea.cl/" target="_blank" rel="noopener">
+        <span><strong>Ver Instagram</strong><span>@distribuidoracea.cl</span></span>
+        <span aria-hidden="true">↗</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+      <section class="landing-shop-cta" aria-labelledby="landing-shop-title">
+        <div class="shell">
+          <h2 id="landing-shop-title">Compra directo a CEA</h2>
+          <a class="primary" href="#tienda" data-action="catalog" data-line="todos">Ir a la tienda <span aria-hidden="true">→</span></a>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer" id="contacto">
+      <div class="shell">
+        <div class="footer-main">
+          <div class="footer-identity">
+            <a class="site-brand" href="#inicio" data-action="home">
+              <img src="assets/logo.webp" alt="" width="48" height="48">
+              <span>Distribuidora <strong>CEA</strong></span>
+            </a>
+            <p>Fabricamos detergentes y distribuimos productos de limpieza.</p>
+          </div>
+          <nav aria-label="Enlaces del pie de página">
+            <h2>Empresa y tienda</h2>
+            <a href="#empresa" data-action="section" data-section="empresa">Nuestra empresa</a>
+            <a href="#tienda" data-action="catalog" data-line="todos">Tienda</a>
+            <a href="#granel" data-action="section" data-section="granel">Venta a granel</a>
+          </nav>
+          <div class="footer-contact">
+            <h2 data-section-heading>Contacto</h2>
+            <a href="mailto:contacto@distribuidoracea.cl">contacto@distribuidoracea.cl</a>
+            <a href="https://www.instagram.com/distribuidoracea.cl/" target="_blank" rel="noopener">Instagram <span aria-hidden="true">↗</span></a>
+            <p>Talca, Región del Maule</p>
+          </div>
+          <div class="footer-payment">
+            <h2>Pago de prueba</h2>
+            <strong class="footer-webpay">Webpay <span>Plus</span></strong>
+            <p>Transbank</p>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <small>© 2026 Distribuidora CEA</small>
+          <a class="servimat-credit" href="https://www.instagram.com/servimat._/" target="_blank" rel="noopener"><span>Diseñado por</span><img src="assets/servimat.webp" alt="" width="22" height="22"><strong>SERVIMAT™</strong><span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </footer>
+    <dialog id="cart-drawer" class="cart-drawer" aria-labelledby="cart-drawer-title">
+      <div class="cart-drawer-head">
+        <h2 id="cart-drawer-title">Tu carrito</h2>
+        <button type="button" class="cart-drawer-close" data-action="close-cart" aria-label="Ocultar carrito">×</button>
+      </div>
+      <div class="cart-drawer-body" data-cart-body></div>
+      <div class="cart-drawer-summary" data-cart-summary></div>
+    </dialog>
+    <dialog class="quick-dialog" aria-labelledby="quick-buy-title"></dialog>
+    <div class="cart-toast" hidden>
+      <span data-toast-label></span>
+      <a href="#carrito" data-action="cart">Ver carrito <span aria-hidden="true">↗</span></a>
+      <button type="button" data-action="dismiss-toast" aria-label="Cerrar aviso">×</button>
+    </div>
+    <div class="sr-only" role="status" data-live></div>
+  </div>
 </body>
 </html>
