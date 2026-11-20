@@ -628,6 +628,16 @@ function loadCart() {
   return cart;
 }
 
+function resetAddition(button) {
+  clearTimeout(addFeedbackTimers.get(button));
+  const label = button.querySelector('[data-add-label]');
+  const icon = button.querySelector('[data-add-icon]');
+  label.textContent = label.dataset.addLabel;
+  icon.textContent = icon.dataset.addIcon;
+  button.removeAttribute('data-added');
+  addFeedbackTimers.delete(button);
+}
+
 function confirmAddition(button) {
   const label = button.querySelector('[data-add-label]');
   const icon = button.querySelector('[data-add-icon]');
@@ -635,12 +645,7 @@ function confirmAddition(button) {
   icon.textContent = '✓';
   button.setAttribute('data-added', '');
   clearTimeout(addFeedbackTimers.get(button));
-  addFeedbackTimers.set(button, setTimeout(() => {
-    label.textContent = label.dataset.addLabel;
-    icon.textContent = icon.dataset.addIcon;
-    button.removeAttribute('data-added');
-    addFeedbackTimers.delete(button);
-  }, 1800));
+  addFeedbackTimers.set(button, setTimeout(() => resetAddition(button), 1800));
 }
 
 function addToCart({product = state.product, formatIndex = state.format, quantity = state.qty, source, animationSource = source}) {
@@ -654,6 +659,7 @@ function addToCart({product = state.product, formatIndex = state.format, quantit
   const added = qty - previous;
   const message = added ? `${added} × ${product.name} al carrito.` : 'Ya tienes el máximo de unidades de este formato.';
   if (added) confirmAddition(source);
+  else resetAddition(source);
   cartToast.querySelector('[data-toast-label]').textContent = message;
   cartToast.hidden = false;
   cartToast.querySelector('.cart-toast-mark').textContent = added ? '✓' : 'i';
