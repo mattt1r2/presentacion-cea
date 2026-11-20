@@ -573,6 +573,8 @@ function renderConfirmation() {
         <div class="order-panel checkout-summary">
           <h2>Detalle de la compra</h2>
           ${orderSummary(order.items,order.total)}
+          <button class="secondary receipt-email-preview" type="button" data-action="preview-email">Ver correo de confirmación <span aria-hidden="true">↗</span></button>
+          <p class="hint">Vista previa del correo. El envío se habilita al conectar la tienda real.</p>
           <button class="primary" type="button" data-action="catalog" data-line="todos">Volver a la tienda <span aria-hidden="true">→</span></button>
         </div>
       </div>
@@ -639,13 +641,9 @@ function confirmAddition(button) {
     button.removeAttribute('data-added');
     addFeedbackTimers.delete(button);
   }, 1800));
-  if (matchMedia('(prefers-reduced-motion: no-preference)').matches) {
-    for (const animation of cartCount.getAnimations()) animation.cancel();
-    cartCount.animate([{transform:'scale(1)'}, {transform:'scale(1.16)', offset:.45}, {transform:'scale(1)'}], {duration:250, easing:'ease-out'});
-  }
 }
 
-function addToCart({product = state.product, formatIndex = state.format, quantity = state.qty, source}) {
+function addToCart({product = state.product, formatIndex = state.format, quantity = state.qty, source, animationSource = source}) {
   const key = cartKey(product, formatIndex);
   const current = state.cart.get(key);
   const previous = current?.qty ?? 0;
@@ -658,6 +656,15 @@ function addToCart({product = state.product, formatIndex = state.format, quantit
   if (added) confirmAddition(source);
   cartToast.querySelector('[data-toast-label]').textContent = message;
   cartToast.hidden = false;
+  cartToast.querySelector('.cart-toast-mark').textContent = added ? '✓' : 'i';
+  if (added) {
+    window.ceaCartFeedback.play({
+      source:animationSource,
+      image:media[formatImage(product, formatIndex)],
+      target:cartLink,
+      toast:cartToast
+    });
+  }
   live(message);
 }
 
@@ -741,7 +748,7 @@ function fillDemo() {
 
 let orderNumber = 1;
 function approve() {
-  state.receipt = {id:`CEA-DEMO-${String(orderNumber++).padStart(3,'0')}`, items:rows(), total:subtotal(), email:state.contact.email};
+  state.receipt = {id:`CEA-DEMO-${String(orderNumber++).padStart(3,'0')}`, items:rows(), total:subtotal(), email:state.contact.email, firstName:state.contact.first};
   state.cart.clear();
   state.contact = {};
   state.error = false;
@@ -793,9 +800,10 @@ shop.addEventListener('click', event => {
       updateQuickBuy();
       break;
     case 'quick-submit':
-      addToCart(quickPurchase);
+      addToCart({...quickPurchase, animationSource:control});
       quickDialog.close();
       break;
+    case 'preview-email': window.ceaOrderEmailPreview.open(state.receipt); break;
     case 'dismiss-toast': cartToast.hidden = true; cartLink.focus(); break;
     case 'product': {
       const product = getProduct(data.id);

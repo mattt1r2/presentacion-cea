@@ -13,8 +13,12 @@
   <link rel="stylesheet" href="sections.css">
   <link rel="stylesheet" href="commerce.css">
   <link rel="stylesheet" href="grafito.css">
+  <link rel="stylesheet" href="cart-feedback.css">
+  <link rel="stylesheet" href="correo-pedido.css">
   <script src="catalog.js" defer></script>
   <script src="promotion-pricing.js" defer></script>
+  <script src="cart-feedback.js" defer></script>
+  <script src="correo-pedido.js" defer></script>
   <script src="storefront.js" defer></script>
   <script src="promotions.js" defer></script>
 </head>
@@ -230,6 +234,7 @@
     </dialog>
     <dialog class="quick-dialog" aria-labelledby="quick-buy-title"></dialog>
     <div class="cart-toast" hidden>
+      <span class="cart-toast-mark" aria-hidden="true">✓</span>
       <span data-toast-label></span>
       <a href="#carrito" data-action="cart">Ver carrito <span aria-hidden="true">↗</span></a>
       <button type="button" data-action="dismiss-toast" aria-label="Cerrar aviso">×</button>
