@@ -11,7 +11,7 @@ const regions = ['Arica y Parinacota','Tarapacá','Antofagasta','Atacama','Coqui
 const sample = { first:'Camila', last:'Ejemplo', email:'cliente@example.com', phone:'+56 9 0000 0000', address:'Calle de Ejemplo 123', city:'Talca', region:'Maule' };
 const minimum = 20000;
 const modeLabels = {minorista:'Al detalle', mayorista:'Mayorista'};
-const catalogLines = [['todos','Todas las líneas'], ['automotriz','Automotriz'], ['hogar','Hogar'], ['promociones','Promociones']];
+const catalogLines = [['todos','Todo'], ['hogar','Hogar'], ['automotriz','Automotriz'], ['promociones','Ofertas']];
 const catalogModes = [['todos','Todos'], ...Object.entries(modeLabels)];
 const catalogSorts = [['destacados','Destacados'], ['precio-asc','Menor precio'], ['precio-desc','Mayor precio'], ['nombre','Nombre']];
 const formerProductSlugs = new Map([
@@ -25,7 +25,6 @@ const formerProductSlugs = new Map([
   ['limpia-tapiz-automotriz-mayorista', ['tapiz', 0]]
 ]);
 const money = new Intl.NumberFormat('es-CL', {style:'currency', currency:'CLP'});
-const narrowCatalog = matchMedia('(max-width: 650px)');
 const shop = document.querySelector('.store');
 const main = document.getElementById('store-main');
 const siteHeader = shop.querySelector('.site-header');
@@ -94,36 +93,205 @@ function productMedia(product, label = '', image = product.image) {
   return '<span class="photo-fallback"><strong>CEA</strong><small>Imagen no disponible</small></span>';
 }
 
+const factoryFamilies = [
+  {id:'polvo', label:'Polvo', name:'Detergente en polvo', detail:'Matic Premium para la ropa'},
+  {id:'detergente', label:'Gel', name:'Detergente en gel', detail:'Matic para la ropa'},
+  {id:'pisos', label:'Limpiapisos', name:'Limpiapisos', detail:'Limpieza de pisos del hogar'}
+];
+let activeFamily = factoryFamilies[0];
+const factoryChoices = new Map();
+let stopFactoryRotation;
+
+function startFactoryRotation(feature) {
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  const events = new AbortController();
+  const options = {signal:events.signal};
+  const interval = 7000;
+  const fadeDuration = 200;
+  let timer;
+  let visible = !('IntersectionObserver' in window);
+  let overButton = false;
+
+  function canRotate() {
+    return !events.signal.aborted && visible && !feature.hidden && !document.hidden && !motion.matches
+      && !overButton && !feature.contains(document.activeElement) && !quickDialog.open && !cartDrawer.open;
+  }
+
+  function schedule() {
+    clearTimeout(timer);
+    feature.classList.remove('factory-changing');
+    if (canRotate()) timer = setTimeout(beginFade, interval - fadeDuration);
+  }
+
+  function beginFade() {
+    if (!canRotate()) return;
+    feature.classList.add('factory-changing');
+    timer = setTimeout(() => {
+      if (canRotate()) {
+        activeFamily = factoryFamilies[(factoryFamilies.indexOf(activeFamily) + 1) % factoryFamilies.length];
+        renderFactoryFamily(true);
+      }
+      schedule();
+    }, fadeDuration);
+  }
+
+  const visibility = 'IntersectionObserver' in window ? new IntersectionObserver(([entry]) => {
+    visible = entry.isIntersecting && entry.intersectionRatio >= .25;
+    schedule();
+  }, {threshold:.25}) : null;
+  visibility?.observe(feature);
+  const changes = new MutationObserver(schedule);
+  changes.observe(feature, {attributes:true, attributeFilter:['hidden']});
+  for (const dialog of [quickDialog, cartDrawer]) {
+    changes.observe(dialog, {attributes:true, attributeFilter:['open']});
+  }
+  feature.addEventListener('pointerover', event => {
+    if (event.pointerType === 'mouse' && event.target.closest('button')) {
+      overButton = true;
+      schedule();
+    }
+  }, options);
+  feature.addEventListener('pointerout', event => {
+    const nextButton = event.relatedTarget?.closest?.('button');
+    if (overButton && (!nextButton || !feature.contains(nextButton))) {
+      overButton = false;
+      schedule();
+    }
+  }, options);
+  feature.addEventListener('focusin', schedule, options);
+  feature.addEventListener('focusout', () => queueMicrotask(schedule), options);
+  motion.addEventListener('change', schedule, options);
+  document.addEventListener('visibilitychange', schedule, options);
+
+  function stop() {
+    if (events.signal.aborted) return;
+    events.abort();
+    visibility?.disconnect();
+    changes.disconnect();
+    clearTimeout(timer);
+    feature.classList.remove('factory-changing');
+    feature.querySelector('.factory-price').setAttribute('aria-live', 'polite');
+  }
+  function stopOnChoice(event) {
+    if (event.target.closest('button')) stop();
+  }
+  feature.addEventListener('pointerdown', schedule, options);
+  feature.addEventListener('click', stopOnChoice, options);
+  schedule();
+  return stop;
+}
+
+function factoryOptions(product) {
+  if (product.id === 'polvo') {
+    return promotionPricing.quantityPrices(product, 0).map(([quantity]) => ({
+      label:quantity === 1 ? '1 saco' : `${quantity} sacos`, format:0, quantity
+    }));
+  }
+  return product.formats.map(([label], format) => ({
+    label:label.replace(' con suavizante', ''), format, quantity:1
+  }));
+}
+
+function shopFeatures() {
+  return `<section class="market-features" aria-labelledby="factory-heading">
+    <div class="factory-bar">
+      <h2 id="factory-heading">Fabricación propia</h2>
+      <div class="factory-families" role="group" aria-label="Elegir producto de fabricación propia">
+        ${factoryFamilies.map(family => `<button type="button" data-action="factory-family" data-id="${family.id}" aria-pressed="${family === activeFamily}" aria-controls="factory-display">${family.label}</button>`).join('')}
+      </div>
+    </div>
+    <div id="factory-display"></div>
+  </section>`;
+}
+
+function renderFactoryFamily(automatic = false) {
+  const feature = main.querySelector('.market-features');
+  const product = getProduct(activeFamily.id);
+  const options = factoryOptions(product);
+  feature.dataset.family = product.id;
+  for (const button of feature.querySelectorAll('[data-action=factory-family]')) {
+    button.setAttribute('aria-pressed', button.dataset.id === product.id);
+  }
+  let photo = productMedia(product, product.name);
+  if (product.id === 'polvo') photo = `<span class="shelf-sack">${photo}</span>`;
+  if (product.id === 'detergente') photo = '<img src="assets/cea-matic-aqua.webp" width="1672" height="941" alt="Bidones de detergente en gel Matic CEA">';
+  feature.querySelector('#factory-display').innerHTML = `
+    <div class="factory-intro">
+      <h3>${activeFamily.name}</h3>
+      <p>${activeFamily.detail}</p>
+    </div>
+    <figure class="market-photo-stage">${photo}</figure>
+    <div class="factory-buy">
+      <fieldset class="factory-options"><legend>${product.id === 'polvo' ? 'Cantidad de sacos' : 'Presentación'}</legend>
+        <div>${options.map((option, i) => `<button type="button" data-action="factory-option" data-index="${i}" aria-pressed="false">${escapeHtml(option.label)}</button>`).join('')}</div>
+      </fieldset>
+      <div class="factory-order">
+        <div class="factory-price" aria-live="${automatic ? 'off' : 'polite'}" aria-atomic="true">
+          <div><strong data-factory-price></strong> <span data-factory-basis></span></div>
+          <small data-factory-note></small>
+        </div>
+        <button class="factory-buy-button" type="button" aria-haspopup="dialog" data-action="factory-buy"><span data-add-label="Comprar">Comprar</span><span aria-hidden="true" data-add-icon="+">+</span></button>
+      </div>
+    </div>`;
+  updateFactoryOffer();
+}
+
+function updateFactoryOffer() {
+  const feature = main.querySelector('#factory-display');
+  if (!feature) return;
+  const product = getProduct(activeFamily.id);
+  const index = factoryChoices.get(product.id) ?? 0;
+  const {format, quantity} = factoryOptions(product)[index];
+  const price = purchasePreview(product, format, quantity);
+  const unit = purchasePresentation(product, format);
+  const countLabel = price.totalQuantity === 1 ? unit.singular : unit.plural;
+  const tier = promotionPricing.tiers(product, format).find(([minimum]) => minimum > price.totalQuantity);
+  let note = '';
+  if (price.includesCart) note = `Al agregar, ${price.totalQuantity} ${countLabel} por ${currency(price.total)} en total`;
+  else if (quantity > 1) note = `${quantity} ${unit.plural} por ${currency(price.total)} en total`;
+  else if (tier) note = `Desde ${tier[0]} ${unit.plural}, ${currency(tier[1])} c/u`;
+  else if (format === product.packFormat) note = unit.label.replace(/^Pack de /i, '');
+  feature.querySelector('[data-factory-price]').textContent = currency(price.price);
+  feature.querySelector('[data-factory-basis]').textContent = format === product.packFormat ? 'por pack' : unit.priceBasis;
+  feature.querySelector('[data-factory-note]').textContent = note;
+  for (const button of feature.querySelectorAll('[data-action=factory-option]')) {
+    button.setAttribute('aria-pressed', Number(button.dataset.index) === index);
+  }
+}
+
 function renderShop() {
   const finderVisible = state.finder;
-  const filterGroups = `<div class="catalog-filters">
-    ${catalogFilter('line','Línea',catalogLines)}
-    ${catalogFilter('mode','Tipo de compra',catalogModes)}
-  </div>`;
   main.innerHTML = `
-    <div class="shop-screen layout-facets catalog-compact">
-      <header class="shop-banner">
-        <div class="shell shop-banner-inner">
-          <div class="shop-intro">
-            <p class="shop-breadcrumb"><a href="#inicio" data-action="home">Inicio</a> <span aria-hidden="true">/</span> Tienda</p>
-            <h1 class="view-title" tabindex="-1">Tienda</h1>
-            <p>Compra detergentes y productos de limpieza para el hogar y el auto.</p>
-          </div>
-          <strong class="shop-minimum">Pedido mínimo ${currency(minimum)}</strong>
-          <div class="shop-category-grid" role="group" aria-label="Explorar por línea">
-            <button class="shop-category" type="button" data-action="catalog" data-line="hogar" aria-pressed="${state.line === 'hogar'}" aria-controls="catalog-products">
-              ${productMedia(getProduct('detergente'))}
-              <span class="shop-category-copy"><strong>Hogar</strong><small>Detergentes, pisos y cocina</small></span><span aria-hidden="true">↗</span>
-            </button>
-            <button class="shop-category" type="button" data-action="catalog" data-line="automotriz" aria-pressed="${state.line === 'automotriz'}" aria-controls="catalog-products">
-              ${productMedia(getProduct('lavado'))}
-              <span class="shop-category-copy"><strong>Automotriz</strong><small>Carrocería, llantas y tapiz</small></span><span aria-hidden="true">↗</span>
-            </button>
-          </div>
+    <div class="shop-screen shop-market">
+      <header class="market-head shell">
+        <div class="market-mast">
+          <h1 tabindex="-1">Tienda</h1>
+          <form class="market-search" role="search" id="catalog-search-form">
+            <label class="sr-only" for="catalog-search">Buscar productos en la tienda</label>
+            <input id="catalog-search" type="search" data-search placeholder="Buscar un producto" value="${escapeHtml(state.query)}" aria-controls="catalog-products">
+            <button type="submit" aria-label="Buscar en el catálogo"><span class="market-lens" aria-hidden="true"></span></button>
+          </form>
+          <p class="market-minimum">Pedido mínimo <strong>${currency(minimum)}</strong></p>
+        </div>
+        <div class="market-nav" role="group" aria-label="Categorías de la tienda">
+          ${catalogLines.map(([key,label]) => `<button type="button" data-action="market-line" data-line="${key}" aria-pressed="${key === state.line}" aria-controls="catalog-products">${label}</button>`).join('')}
         </div>
       </header>
+      <div class="shell market-body">
+      ${shopFeatures()}
+      <section class="catalog-zone" id="catalog-zone" aria-labelledby="catalog-title">
+        <div class="market-catalog-head">
+          <div class="market-result-title"><h2 id="catalog-title" tabindex="-1">Catálogo</h2>
+            <p class="catalog-count" aria-live="polite"></p></div>
+          <div class="market-controls">
+            <label>Tipo de compra<select data-mode aria-controls="catalog-products">${catalogOptions(catalogModes, state.mode)}</select></label>
+            <label>Ordenar por<select data-sort aria-controls="catalog-products">${catalogOptions(catalogSorts, state.sort)}</select></label>
+            <button type="button" class="market-finder" data-action="finder" aria-expanded="${finderVisible}" aria-controls="use-zone">Buscar por uso</button>
+          </div>
+        </div>
+        <button type="button" class="text-button catalog-reset" data-action="reset-filters" hidden>Limpiar filtros</button>
       <section class="use-zone" id="use-zone" aria-labelledby="use-title" ${finderVisible ? '' : 'hidden'}>
-        <div class="shell use-layout">
+        <div class="use-layout">
           <div class="use-heading">
             <h2 id="use-title" tabindex="-1">¿Qué vas a limpiar?</h2>
             <div class="use-lines" role="group" aria-label="Línea para buscar por uso">
@@ -135,39 +303,14 @@ function renderShop() {
           <div class="use-result" aria-live="polite"></div>
         </div>
       </section>
-      <div class="shell shop-composition">
-        <aside class="shop-filters" aria-label="Filtros del catálogo">
-          <label class="search-label">Buscar producto <input class="input" type="search" data-search placeholder="Ej. detergente" value="${escapeHtml(state.query)}" aria-controls="catalog-products"></label>
-          <details class="catalog-disclosure"${narrowCatalog.matches ? '' : ' open'}><summary>Filtros</summary>${filterGroups}</details>
-        </aside>
-        <section class="catalog-zone" id="catalog-zone" aria-labelledby="catalog-title">
-          <div class="catalog-top">
-            <div>
-              <h2 id="catalog-title" tabindex="-1">Catálogo</h2>
-              <div class="catalog-results-controls"><p class="catalog-count" aria-live="polite"></p>
-              <button type="button" class="text-button catalog-reset" data-action="reset-filters" hidden>Limpiar filtros</button></div>
-            </div>
-            <div class="catalog-controls">
-              <button type="button" class="secondary finder-toggle" data-action="finder" aria-expanded="${finderVisible}" aria-controls="use-zone">Buscar por uso</button>
-              <label class="sort-label">Ordenar <select class="input" data-sort aria-controls="catalog-products">${catalogOptions(catalogSorts, state.sort)}</select></label>
-            </div>
-          </div>
-          <div class="products" id="catalog-products"></div>
-        </section>
+        <div class="products" id="catalog-products"></div>
+      </section>
       </div>
     </div>`;
   renderUse(main.querySelector('#use-zone'));
+  renderFactoryFamily();
   renderProducts();
-}
-
-narrowCatalog.addEventListener('change', ({matches}) => {
-  const disclosure = main.querySelector('.catalog-disclosure');
-  if (disclosure) disclosure.open = !matches;
-});
-
-function catalogFilter(group, title, options) {
-  return `<fieldset class="filter-group"><legend>${title}</legend><div>${options.map(([key, label]) => `
-    <button type="button" class="chip" data-action="filter" data-filter="${group}" data-value="${key}" aria-pressed="${state[group] === key}" aria-controls="catalog-products">${label}</button>`).join('')}</div></fieldset>`;
+  stopFactoryRotation = startFactoryRotation(main.querySelector('.market-features'));
 }
 
 function catalogOptions(options, selected) {
@@ -214,34 +357,46 @@ function renderProducts() {
     && (state.mode === 'todos' || product.modes.includes(state.mode))
     && normalize([product.name, product.line, product.description, ...product.formats.map(([format]) => format)].join(' ')).includes(query));
   if (order[state.sort]) result.sort(order[state.sort]);
-  main.querySelectorAll('[data-filter]').forEach(button => button.setAttribute('aria-pressed', state[button.dataset.filter] === button.dataset.value));
-  main.querySelectorAll('.shop-category').forEach(button => button.setAttribute('aria-pressed', state.line === button.dataset.line));
-  main.querySelector('[data-action=reset-filters]').hidden = !query && state.line === 'todos' && state.mode === 'todos';
+  main.querySelectorAll('[data-action=market-line]').forEach(button => button.setAttribute('aria-pressed', state.line === button.dataset.line));
+  main.querySelector('[data-mode]').value = state.mode;
+  const filtered = Boolean(query) || state.line !== 'todos' || state.mode !== 'todos';
+  main.querySelector('.market-features').hidden = filtered;
+  main.querySelector('[data-action=reset-filters]').hidden = !filtered;
+  main.querySelector('#catalog-title').textContent = query ? 'Resultados de búsqueda'
+    : state.line === 'todos' ? 'Catálogo' : catalogLines.find(([key]) => key === state.line)[1];
   main.querySelector('.catalog-count').textContent = `${result.length} ${result.length === 1 ? 'producto' : 'productos'}`;
-  const filterSummary = main.querySelector('.catalog-disclosure summary');
-  if (filterSummary) {
-    const activeFilters = Number(state.line !== 'todos') + Number(state.mode !== 'todos');
-    filterSummary.textContent = activeFilters ? `Filtros (${activeFilters})` : 'Filtros';
-  }
-  main.querySelector('.products').innerHTML = result.length ? result.map(p => `
-    <article class="product">
+  main.querySelector('.products').innerHTML = result.length ? result.map(p => {
+    const lowestPrice = basePrice(p);
+    const matchingFormats = p.formats.filter(([, price]) => price === lowestPrice);
+    const formatLabel = matchingFormats.map(([format]) => escapeHtml(format)).join(' / ');
+    const mode = p.modes.length > 1 && !p.tiersByFormat ? 'Al detalle y por mayor' : modeLabels[p.modes[0]];
+    let photo = productMedia(p);
+    if (p.image === 'promo-polvo') photo = `<span class="shelf-sack">${photo}</span>`;
+    if (p.image === 'producto-573') photo = '<img src="assets/cea-matic-aqua.webp" alt="" loading="lazy">';
+    if (!p.image) photo = '<span class="shelf-no-photo">Sin fotografía</span>';
+    return `<article class="product" data-shelf-line="${p.line}">
       <a class="product-link" href="#producto/${p.slug}" data-action="product" data-id="${p.id}">
-        <div class="product-picture">${productMedia(p)}</div>
+        <div class="product-picture" data-photo="${p.image ?? ''}">${photo}</div>
         <div class="product-copy">
-          <span class="eyebrow">${upper(p.line)} · ${purchaseModeText(p)}</span>
           <h3>${escapeHtml(p.name)}</h3>
-          <span class="product-formats">${p.formats.map(([format]) => escapeHtml(format)).join(' · ')}</span>
-          <p>${priceLabel(p)}</p>
-          ${p.formats.map(([format], index) => {
-            const tier = promotionPricing.tiers(p, index).at(-1);
-            return tier ? `<small class="product-volume-price">${escapeHtml(format)} · ${currency(tier[1])} c/u desde ${tier[0]}</small>` : '';
-          }).join('')}
+          <div class="shelf-pricing">
+            <span class="shelf-price-context">${mode} · ${formatLabel}</span>
+            <p>${matchingFormats.length < p.formats.length ? '<small>Desde</small> ' : ''}<strong>${currency(lowestPrice)}</strong></p>
+            ${p.formats.map(([format], index) => {
+              const tier = promotionPricing.tiers(p, index).at(-1);
+              if (!tier) return '';
+              const presentation = p.formats.length > 1 ? escapeHtml(format) + ' · ' : '';
+              return `<small class="product-volume-price">${presentation}${tier[0]} o más a ${currency(tier[1])} c/u</small>`;
+            }).join('')}
+            ${p.packFormat != null ? `<small class="product-volume-price">${escapeHtml(p.formats[p.packFormat][0])} · ${currency(p.formats[p.packFormat][1])}</small>` : ''}
+          </div>
         </div>
       </a>
       <div class="product-actions">
         <button type="button" class="primary quick-add" data-action="quick-buy" data-id="${p.id}" aria-haspopup="dialog" aria-label="Agregar ${escapeHtml(p.name)}, ${purchaseModeText(p)}"><span data-add-label="Agregar">Agregar</span><span aria-hidden="true" data-add-icon="+">+</span></button>
       </div>
-    </article>`).join('') : '<p class="empty">No hay productos para esta búsqueda. Prueba con otro nombre o filtro.</p>';
+    </article>`;
+  }).join('') : '<p class="empty">No hay productos para esta búsqueda. Prueba con otro nombre o filtro.</p>';
 }
 
 function showUse(use, finder) {
@@ -323,6 +478,8 @@ function go(view, {focus = true, scroll = true, replace = false, anchor = ''} = 
   cartToast.hidden = true;
   if (quickDialog.open) quickDialog.close();
   if (cartDrawer.open) cartDrawer.close();
+  stopFactoryRotation?.();
+  stopFactoryRotation = undefined;
   screens[view]();
   const activeNav = view !== 'home' ? 'tienda' : anchor === 'contacto' ? 'contacto' : ['empresa','lineas','granel'].includes(anchor) ? 'empresa' : 'inicio';
   highlightNavigation(activeNav, true);
@@ -377,24 +534,47 @@ function purchasePreview(product, formatIndex, quantity) {
   return {price, totalQuantity, total:price * totalQuantity, includesCart:current > 0};
 }
 
+function purchasePresentation(product, formatIndex) {
+  const label = product.formats[formatIndex][0];
+  const packaging = /^\s*saco\b/i.test(label) ? ['saco', 'sacos']
+    : /^\s*pack\b/i.test(label) ? ['pack', 'packs']
+    : /^\s*bid[oó]n\b/i.test(label) ? ['bidón', 'bidones']
+    : ['unidad', 'unidades'];
+  const [singular, plural] = packaging;
+  const priceBasis = singular === 'unidad'
+    ? `por unidad · ${label}`
+    : `por ${label.charAt(0).toLocaleLowerCase('es-CL')}${label.slice(1)}`;
+  return {label, singular, plural, priceBasis};
+}
+
 function quantityPricingMarkup(product, formatIndex) {
   if (!promotionPricing.tiers(product, formatIndex).length) return '';
   const prices = promotionPricing.quantityPrices(product, formatIndex);
+  const {singular, plural} = purchasePresentation(product, formatIndex);
   return `<div class="quantity-prices"><strong>Precios por cantidad</strong>
     <dl>${prices.map(([minimum, amount], index) => {
       const nextTier = prices[index + 1];
-      const range = nextTier ? `${minimum} a ${nextTier[0] - 1} unidades` : `Desde ${minimum} unidades`;
+      const range = nextTier ? `${minimum} a ${nextTier[0] - 1} ${plural}` : `Desde ${minimum} ${plural}`;
       const option = index > 0
-        ? `<button class="tier-quantity" type="button" data-action="tier-quantity" data-minimum="${minimum}" aria-label="${range}, seleccionar precio por cantidad">${range}</button>`
+        ? `<button class="tier-quantity" type="button" data-action="tier-quantity" data-minimum="${minimum}" aria-label="${range}, ${currency(amount)} por ${singular}; seleccionar esta cantidad">${range}</button>`
         : range;
-      return `<div><dt>${option}</dt><dd>${currency(amount)} c/u</dd></div>`;
+      return `<div><dt>${option}</dt><dd>${currency(amount)} por ${singular}</dd></div>`;
     }).join('')}</dl></div>`;
 }
 
 function renderPurchasePresentation(container, product, formatIndex) {
-  const label = `${product.name} · ${product.formats[formatIndex][0]}`;
+  const presentation = purchasePresentation(product, formatIndex);
+  const label = `${product.name} · ${presentation.label}`;
   container.querySelector('[data-purchase-photo]').innerHTML = productMedia(product, label, formatImage(product, formatIndex));
   container.querySelector('[data-quantity-prices]').innerHTML = quantityPricingMarkup(product, formatIndex);
+  container.querySelector('[data-price-format]').textContent = presentation.priceBasis;
+  container.querySelector('[data-quantity-label]').textContent = `Cantidad de ${presentation.plural}`;
+  const quantity = container.querySelector('.quantity');
+  quantity.setAttribute('aria-label', `Cantidad de ${presentation.plural} · ${label}`);
+  quantity.querySelector('output').setAttribute('aria-label', `Cantidad de ${presentation.plural}`);
+  const article = presentation.singular === 'unidad' ? 'una' : 'un';
+  quantity.querySelector('[data-delta="-1"]').setAttribute('aria-label', `Restar ${article} ${presentation.singular} · ${label}`);
+  quantity.querySelector('[data-delta="1"]').setAttribute('aria-label', `Sumar ${article} ${presentation.singular} · ${label}`);
 }
 
 function renderDetail() {
@@ -404,21 +584,25 @@ function renderDetail() {
       <button class="text-button back" type="button" data-action="catalog">← Volver a Tienda</button>
       <div class="product-view">
         <figure class="detail-photo" data-purchase-photo></figure>
-        <div>
-          <span class="eyebrow">${upper(p.line)} · ${purchaseModeText(p)}</span>
-          <h1 class="view-title" tabindex="-1">${escapeHtml(p.name)}</h1>
-          ${p.description ? `<p class="description">${escapeHtml(p.description)}</p>` : ''}
-          <p class="detail-price" data-price></p>
-          <strong>Formato</strong>
-          <div class="variant-group" role="group" aria-label="Formato">${p.formats.map(([label], index) => `
-            <button type="button" class="chip" data-action="variant" data-index="${index}" aria-pressed="${index === state.format}">${escapeHtml(label)}</button>`).join('')}</div>
-          <strong>Cantidad</strong>
-          <div class="detail-actions">
-            ${stepper(state.qty, 'quantity', '', p.name, 1)}
-            <button class="primary" type="button" data-action="add" aria-label="Agregar al carrito"><span data-add-label="Agregar al carrito">Agregar al carrito</span><span aria-hidden="true" data-add-icon="→">→</span></button>
+        <div class="detail-summary">
+          <header class="detail-intro">
+            <span class="eyebrow">${upper(p.line)} · ${purchaseModeText(p)}</span>
+            <h1 class="view-title" tabindex="-1">${escapeHtml(p.name)}</h1>
+            ${p.description ? `<p class="description">${escapeHtml(p.description)}</p>` : ''}
+          </header>
+          <div class="detail-purchase">
+            <div class="detail-price-row"><p class="detail-price" data-price></p><span data-price-format></span></div>
+            <strong class="detail-label" id="detail-format-label">Presentación</strong>
+            <div class="variant-group" role="group" aria-labelledby="detail-format-label">${p.formats.map(([label], index) => `
+              <button type="button" class="chip" data-action="variant" data-index="${index}" aria-pressed="${index === state.format}">${escapeHtml(label)}</button>`).join('')}</div>
+            <strong class="detail-label" data-quantity-label>Cantidad</strong>
+            <div class="detail-actions">
+              ${stepper(state.qty, 'quantity', '', p.name, 1)}
+              <button class="primary" type="button" data-action="add" aria-label="Agregar al carrito"><span data-add-label="Agregar al carrito">Agregar al carrito</span><span aria-hidden="true" data-add-icon="→">→</span></button>
+            </div>
+            <p class="detail-note" data-detail-total aria-live="polite"></p>
+            <div data-quantity-prices></div>
           </div>
-          <p class="detail-note" data-detail-total aria-live="polite"></p>
-          <div data-quantity-prices></div>
         </div>
       </div>
     </section>`;
@@ -427,13 +611,13 @@ function renderDetail() {
 }
 
 function updateDetail() {
-  const format = state.product.formats[state.format][0];
+  const presentation = purchasePresentation(state.product, state.format);
   const preview = purchasePreview(state.product, state.format, state.qty);
-  const quantityLabel = `${preview.totalQuantity} ${preview.totalQuantity === 1 ? 'unidad' : 'unidades'}`;
+  const quantityLabel = `${preview.totalQuantity} ${preview.totalQuantity === 1 ? presentation.singular : presentation.plural}`;
   main.querySelector('[data-price]').textContent = currency(preview.price);
   main.querySelector('[data-detail-total]').textContent = preview.includesCart
-    ? `Al agregar · ${currency(preview.total)} por ${quantityLabel} en el carrito`
-    : `${format} · ${currency(preview.total)} por ${quantityLabel}`;
+    ? `Carrito al agregar · ${currency(preview.total)} por ${quantityLabel} de esta presentación`
+    : `Subtotal · ${currency(preview.total)} por ${quantityLabel}`;
   main.querySelector('output').value = state.qty;
   main.querySelector('[data-delta="-1"]').disabled = state.qty <= 1;
   main.querySelector('[data-delta="1"]').disabled = state.qty >= 99;
@@ -597,6 +781,7 @@ function jump(id, focus = true) {
 
 function updateCount() {
   cartCount.textContent = units();
+  if (state.view === 'shop') updateFactoryOffer();
   try {
     const quantities = [...state.cart].map(([key, item]) => [key, item.qty]);
     sessionStorage.setItem('cea-cart', JSON.stringify(quantities));
@@ -674,10 +859,12 @@ function addToCart({product = state.product, formatIndex = state.format, quantit
   live(message);
 }
 
-function openQuickBuy(id, source) {
+function openQuickBuy(id, source, formatIndex = 0, quantity = 1) {
   const product = getProduct(id);
   if (!product) return;
-  quickPurchase = {product, formatIndex:0, quantity:1, source};
+  formatIndex = product.formats[formatIndex] ? Number(formatIndex) : 0;
+  quantity = Math.max(1, Math.min(99, Math.trunc(Number(quantity)) || 1));
+  quickPurchase = {product, formatIndex, quantity, source};
   quickDialog.innerHTML = `
     <div class="quick-dialog-head">
       <p>Compra rápida</p>
@@ -688,11 +875,12 @@ function openQuickBuy(id, source) {
       <div class="quick-product-body">
         <span class="eyebrow">${upper(product.line)} · ${purchaseModeText(product)}</span>
         <h2 id="quick-buy-title">${escapeHtml(product.name)}</h2>
-        <label>Presentación<select class="input" data-quick-format>${product.formats.map(([format, price], index) =>
-          `<option value="${index}">${escapeHtml(format)} · ${currency(price)}</option>`).join('')}</select></label>
+        <label class="quick-format-label">Presentación<select class="input" data-quick-format aria-describedby="quick-format-price">${product.formats.map(([format], index) =>
+          `<option value="${index}"${index === formatIndex ? ' selected' : ''}>${escapeHtml(format)}</option>`).join('')}</select></label>
+        <p class="quick-format-price" id="quick-format-price"><strong data-quick-price></strong><span data-price-format></span></p>
         <div class="quick-quantity">
-          <strong>Cantidad</strong>
-          ${stepper(1, 'quick-quantity', '', product.name, 1)}
+          <strong data-quantity-label>Cantidad</strong>
+          ${stepper(quantity, 'quick-quantity', '', product.name, 1)}
         </div>
         <div data-quantity-prices></div>
         <div class="quick-summary"><span data-quick-summary-label>Subtotal</span><strong data-quick-total aria-live="polite"></strong></div>
@@ -708,14 +896,17 @@ function openQuickBuy(id, source) {
 
 function updateQuickBuy() {
   const {product, formatIndex, quantity} = quickPurchase;
+  const presentation = purchasePresentation(product, formatIndex);
   const preview = purchasePreview(product, formatIndex, quantity);
-  quickDialog.querySelector('[data-quick-summary-label]').textContent = preview.includesCart ? 'Subtotal al agregar' : 'Subtotal';
+  const quantityLabel = `${preview.totalQuantity} ${preview.totalQuantity === 1 ? presentation.singular : presentation.plural}`;
+  quickDialog.querySelector('[data-quick-price]').textContent = currency(preview.price);
+  quickDialog.querySelector('[data-quick-summary-label]').textContent = `${preview.includesCart ? 'Carrito al agregar' : 'Subtotal'} · ${quantityLabel}`;
   quickDialog.querySelector('[data-quick-total]').textContent = currency(preview.total);
   const unitPrice = quickDialog.querySelector('[data-quick-unit]');
-  unitPrice.hidden = !promotionPricing.tiers(product, formatIndex).length;
+  unitPrice.hidden = !preview.includesCart;
   if (!unitPrice.hidden) {
-    const unit = preview.totalQuantity === 1 ? 'unidad' : 'unidades';
-    unitPrice.textContent = `${preview.totalQuantity} ${unit} · ${currency(preview.price)} c/u`;
+    const current = cartQuantity(product, formatIndex);
+    unitPrice.textContent = `Incluye ${current} ${current === 1 ? presentation.singular : presentation.plural} que ya tienes de esta presentación.`;
   }
   quickDialog.querySelector('output').value = quantity;
   quickDialog.querySelector('[data-delta="-1"]').disabled = quantity <= 1;
@@ -788,8 +979,28 @@ shop.addEventListener('click', event => {
       break;
     }
     case 'catalog': showCatalog(data.line); break;
+    case 'factory-family': {
+      const family = factoryFamilies.find(item => item.id === data.id);
+      if (family && family !== activeFamily) {
+        activeFamily = family;
+        renderFactoryFamily();
+      }
+      break;
+    }
+    case 'factory-option':
+      factoryChoices.set(activeFamily.id, Number(data.index));
+      resetAddition(main.querySelector('[data-action=factory-buy]'));
+      updateFactoryOffer();
+      break;
+    case 'factory-buy': {
+      const product = getProduct(activeFamily.id);
+      const index = factoryChoices.get(product.id) ?? 0;
+      const {format, quantity} = factoryOptions(product)[index];
+      openQuickBuy(product.id, control, format, quantity);
+      break;
+    }
+    case 'market-line': state.line = data.line; renderProducts(); break;
     case 'finder': toggleFinder(); break;
-    case 'filter': state[data.filter] = data.value; renderProducts(); break;
     case 'reset-filters': {
       Object.assign(state, {line:'todos', mode:'todos', query:''});
       const search = main.querySelector('[data-search]');
@@ -877,12 +1088,20 @@ main.addEventListener('input', event => {
   } else if (event.target.matches('[data-sort]')) {
     state.sort = event.target.value;
     renderProducts();
+  } else if (event.target.matches('[data-mode]')) {
+    state.mode = event.target.value;
+    renderProducts();
   } else if (event.target.form?.id === 'checkout-form') {
     state.contact[event.target.name] = event.target.value;
   }
 });
 
 main.addEventListener('submit', event => {
+  if (event.target.id === 'catalog-search-form') {
+    event.preventDefault();
+    jump('catalog-zone');
+    return;
+  }
   if (event.target.id !== 'checkout-form') return;
   event.preventDefault();
   if (subtotal() < minimum || !event.target.reportValidity()) return;

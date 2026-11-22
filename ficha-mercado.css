@@ -1,0 +1,291 @@
+/* Continuidad de la ficha con el catálogo de productos CEA. */
+.product-detail {
+  --detail-ink: #1d2b22;
+  --detail-muted: #505c4d;
+  --detail-rule: #cbd2c1;
+  --detail-photo: #eeeee4;
+  --detail-action: #c5df6d;
+  padding-block: 18px clamp(38px, 6vw, 78px);
+}
+
+.product-detail .back {
+  min-height: 44px;
+  margin-bottom: clamp(12px, 2vw, 24px);
+  color: #37513b;
+  font-size: .875rem;
+  font-weight: 650;
+}
+
+.product-detail .product-view {
+  grid-template-columns: minmax(0, .98fr) minmax(0, 1.02fr);
+  gap: clamp(25px, 4vw, 58px);
+  align-items: start;
+}
+
+.product-detail .detail-photo {
+  margin: 0;
+  padding: clamp(12px, 2vw, 27px);
+  border: 1px solid #39433724;
+  border-radius: 2px;
+  background: var(--detail-photo);
+}
+
+.product-detail .detail-photo img {
+  width: 100%;
+  height: clamp(300px, 37vw, 500px);
+  max-height: none;
+  padding: 0;
+  object-fit: contain;
+  object-position: center;
+}
+
+.product-detail .detail-photo .photo-fallback {
+  min-height: clamp(300px, 37vw, 500px);
+  background: transparent;
+}
+
+.product-detail .product-view > .detail-summary {
+  padding: 3px 0 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--detail-ink);
+}
+
+.product-detail .detail-intro .eyebrow {
+  color: #465a42;
+  font-size: .8125rem;
+  font-weight: 650;
+  line-height: 1.45;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.product-detail .detail-intro .view-title {
+  max-width: 22ch;
+  margin: 10px 0 15px;
+  color: var(--detail-ink);
+  font: 730 clamp(2rem, 3.7vw, 3.375rem)/1.04 var(--heading);
+  letter-spacing: -.045em;
+  text-wrap: pretty;
+  overflow-wrap: break-word;
+}
+
+.product-detail .detail-intro .description {
+  max-width: 55ch;
+  margin: 0;
+  color: var(--detail-muted);
+  font-size: .9375rem;
+  line-height: 1.6;
+}
+
+.product-detail .detail-purchase {
+  margin-top: clamp(19px, 2.5vw, 31px);
+  padding-top: clamp(18px, 2vw, 25px);
+  border-top: 1px solid var(--detail-rule);
+}
+
+.product-detail .detail-price-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+  margin-bottom: 22px;
+}
+
+.product-detail .detail-price-row .detail-price {
+  margin: 0;
+  color: #203824;
+  font: 760 clamp(2rem, 3vw, 2.625rem)/1 var(--heading);
+  letter-spacing: -.05em;
+  font-variant-numeric: tabular-nums;
+}
+
+.product-detail .detail-price-row > span {
+  flex-basis: 100%;
+  color: var(--detail-muted);
+  font-size: .875rem;
+  line-height: 1.4;
+}
+
+.product-detail .detail-label {
+  display: block;
+  color: var(--detail-ink);
+  font-size: .875rem;
+  font-weight: 700;
+}
+
+.product-detail .variant-group {
+  gap: 7px;
+  margin: 8px 0 20px;
+}
+
+.product-detail .variant-group .chip {
+  min-height: 44px;
+  max-width: 100%;
+  border: 1px solid #98a28e;
+  border-radius: 2px;
+  padding: 9px 13px;
+  background: #fffdf6;
+  color: #364b32;
+  font-size: .875rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.product-detail .variant-group .chip[aria-pressed="true"] {
+  border-color: #2a432d;
+  background: #2a432d;
+  color: #fffdf6;
+}
+
+.product-detail .detail-actions {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: stretch;
+  gap: 11px;
+  margin: 8px 0 11px;
+}
+
+.product-detail .detail-actions .quantity {
+  align-self: stretch;
+  border: 1px solid #98a28e;
+  border-radius: 2px;
+  background: #fffdf6;
+}
+
+.product-detail .detail-actions .quantity button {
+  min-width: 44px;
+  min-height: 48px;
+  border-radius: 0;
+  color: #2a432d;
+  background: transparent;
+}
+
+.product-detail .detail-actions .quantity button:disabled { color: #77816f; }
+.product-detail .detail-actions .quantity output { min-width: 38px; font-size: 1rem; }
+
+.product-detail .detail-actions .primary {
+  justify-content: space-between;
+  min-height: 50px;
+  padding: 10px 15px;
+  border: 1px solid #a4bd4f;
+  border-radius: 2px;
+  background: var(--detail-action);
+  color: #20321c;
+  font-size: .9375rem;
+  font-weight: 730;
+}
+
+.product-detail .detail-actions .primary [data-add-icon] {
+  padding-inline-start: 13px;
+  border-inline-start: 1px solid #6f893c;
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.product-detail .detail-note {
+  margin: 0;
+  color: var(--detail-muted);
+  font-size: .8125rem;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+
+.product-detail .quantity-prices {
+  margin-top: 25px;
+  font-size: .875rem;
+}
+
+.product-detail .quantity-prices > strong { margin-bottom: 10px; font-weight: 700; }
+.product-detail .quantity-prices dl > div { min-height: 46px; border-color: var(--detail-rule); }
+.product-detail .quantity-prices dd { color: #2f4a31; font-weight: 720; }
+.product-detail .quantity-prices .tier-quantity {
+  min-height: 44px;
+  padding: 6px 0;
+  border-color: transparent;
+  border-radius: 0;
+  background: transparent;
+  color: #37513b;
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.product-detail :is(button, a):focus-visible {
+  outline: 3px solid #466a31;
+  outline-offset: 3px;
+}
+
+@media (hover: hover) {
+  .product-detail .variant-group .chip:not([aria-pressed="true"]):hover { border-color: #587547; background: #edf1df; }
+  .product-detail .detail-actions .quantity button:hover:enabled { background: #e9efcf; }
+  .product-detail .detail-actions .primary:not([data-added]):hover { border-color: #839d39; background: #b6d353; filter: none; }
+  .product-detail .quantity-prices .tier-quantity:hover { border-color: transparent; color: #1d3521; text-decoration-thickness: 2px; }
+}
+
+@media (min-width: 901px) and (min-height: 700px) {
+  .product-detail .detail-photo { position: sticky; top: calc(var(--header-height) + 21px); }
+}
+
+@media (max-width: 760px) {
+  .product-detail .product-view { grid-template-columns: minmax(0, 1fr); gap: 23px; }
+  .product-detail .detail-photo img { height: clamp(250px, 56vw, 370px); }
+  .product-detail .detail-photo .photo-fallback { min-height: 250px; }
+  .product-detail .detail-intro .view-title { max-width: 26ch; font-size: clamp(2rem, 5.5vw, 2.8rem); }
+  .product-detail .detail-intro .description { max-width: 65ch; }
+  .product-detail .detail-purchase { margin-top: 20px; }
+}
+
+@media (max-width: 390px) {
+  .product-detail .detail-actions { grid-template-columns: minmax(0, 1fr); }
+  .product-detail .detail-actions .quantity { justify-self: start; }
+  .product-detail .detail-actions .primary { min-height: 48px; }
+  .product-detail .quantity-prices dl > div { gap: 5px; font-size: .8125rem; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .product-detail :is(.chip, .quantity button, .detail-actions .primary) {
+    transition: background-color 150ms ease-out, border-color 150ms ease-out, color 150ms ease-out;
+  }
+}
+
+/* La compra rápida usa la misma relación entre presentación y precio. */
+.quick-dialog .quick-format-label {
+  display: grid;
+  gap: 7px;
+  font-size: .875rem;
+  font-weight: 700;
+}
+
+.quick-dialog .quick-format-price {
+  display: grid;
+  gap: 4px;
+  margin: 14px 0 18px;
+  padding-bottom: 17px;
+  border-bottom: 1px solid var(--commerce-rule);
+}
+
+.quick-dialog .quick-format-price strong {
+  color: var(--commerce-petrol);
+  font: 760 clamp(1.625rem, 4vw, 2rem)/1.1 var(--heading);
+  letter-spacing: -.045em;
+  font-variant-numeric: tabular-nums;
+}
+
+.quick-dialog .quick-format-price span {
+  color: var(--commerce-muted);
+  font-size: .875rem;
+  font-weight: 500;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.quick-dialog .quick-quantity > strong { font-size: .875rem; }
+.quick-dialog .quick-summary { gap: 10px; }
+.quick-dialog .quick-summary > span { line-height: 1.4; }
+.quick-dialog .quantity-prices dd { font-size: .8125rem; }
+
+@media (max-width: 390px) {
+  .quick-dialog .quantity-prices dl > div { gap: 5px; font-size: .8125rem; }
+}
