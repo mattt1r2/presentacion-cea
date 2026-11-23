@@ -95,6 +95,32 @@
           </div>
         </div>
       </section>
+      <section class="cea-newsletter" id="boletin" aria-labelledby="boletin-title">
+        <div class="shell newsletter-layout">
+          <div>
+            <h2 id="boletin-title">Las ofertas, por correo</h2>
+            <p>Entérate cuando publiquemos un pack de detergente o una nueva oferta por mayor.</p>
+          </div>
+          <div class="newsletter-panel">
+            <!-- Para activar las altas reales, poner en este enlace el href HTTPS del formulario público del boletín de CEA. -->
+            <a class="primary" data-newsletter-signup hidden>Suscribirme a las ofertas</a>
+            <form id="newsletter-preview-form" hidden>
+              <label for="newsletter-email">Correo electrónico</label>
+              <div class="newsletter-fields">
+                <input id="newsletter-email" type="email" placeholder="nombre@ejemplo.cl" required aria-describedby="newsletter-note" autocomplete="off">
+                <button class="primary" type="submit">Probar el boletín</button>
+              </div>
+              <p id="newsletter-note">Vista previa. Usa un correo de ejemplo. Esta prueba no guarda direcciones ni envía correos.</p>
+            </form>
+            <article class="newsletter-sample" data-newsletter-sample aria-labelledby="newsletter-subject" hidden>
+              <p>Correo de ejemplo</p>
+              <h3 id="newsletter-subject" tabindex="-1"></h3>
+              <p data-newsletter-offer></p>
+              <a data-newsletter-product>Ver el pack en la tienda</a>
+            </article>
+          </div>
+        </div>
+      </section>
       <section class="home-use" id="por-uso" aria-labelledby="home-use-title" hidden>
         <div class="shell home-use-layout">
           <div class="home-use-controls">
@@ -208,6 +234,7 @@
             <a href="#empresa" data-action="section" data-section="empresa">Nuestra empresa</a>
             <a href="#tienda" data-action="catalog" data-line="todos">Tienda</a>
             <a href="#granel" data-action="section" data-section="granel">Venta a granel</a>
+            <a href="#boletin" data-action="section" data-section="boletin">Boletín de ofertas</a>
           </nav>
           <div class="footer-contact">
             <h2 data-section-heading>Contacto</h2>

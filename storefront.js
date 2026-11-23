@@ -74,6 +74,9 @@ const scrollToView = () => { window.scrollTo({top:0, behavior:'instant'}); };
 
 function renderHome() {
   if (!main.querySelector('.home-hero')) main.replaceChildren(...landing.map(node => node.cloneNode(true)));
+  const signup = main.querySelector('[data-newsletter-signup]');
+  signup.hidden = !signup.getAttribute('href');
+  main.querySelector('#newsletter-preview-form').hidden = !signup.hidden || !main.querySelector('[data-newsletter-sample]').hidden;
   const finder = main.querySelector('.home-use');
   if (finder.hidden) {
     finder.querySelector('[data-home-use-options]').innerHTML = useButtons();
@@ -428,7 +431,7 @@ function showCatalog(line) {
 }
 
 const fragments = {home:'inicio', shop:'tienda', cart:'carrito', checkout:'datos', payment:'pago', confirmation:'confirmacion'};
-const landingAnchors = new Set(['por-uso','promociones','empresa','lineas','granel','contacto']);
+const landingAnchors = new Set(['por-uso','promociones','boletin','empresa','lineas','granel','contacto']);
 
 function productFragment(product, formatIndex) {
   const suffix = formatIndex === product.packFormat ? '/pack' : formatIndex > 0 ? `/formato-${formatIndex + 1}` : '';
@@ -1097,6 +1100,26 @@ main.addEventListener('input', event => {
 });
 
 main.addEventListener('submit', event => {
+  if (event.target.id === 'newsletter-preview-form') {
+    event.preventDefault();
+    const product = getProduct('detergente');
+    const format = product.packFormat;
+    const sampleEmail = main.querySelector('[data-newsletter-sample]');
+    const subject = sampleEmail.querySelector('h3');
+    subject.textContent = product.name;
+    sampleEmail.querySelector('[data-newsletter-offer]').textContent =
+      product.formats[format][0] + ' por ' + currency(promotionPricing.unitPrice(product, format, 1));
+    const link = sampleEmail.querySelector('a');
+    link.href = '#' + productFragment(product, format);
+    link.dataset.action = 'product';
+    link.dataset.id = product.id;
+    link.dataset.format = format;
+    event.target.reset();
+    event.target.hidden = true;
+    sampleEmail.hidden = false;
+    subject.focus();
+    return;
+  }
   if (event.target.id === 'catalog-search-form') {
     event.preventDefault();
     jump('catalog-zone');

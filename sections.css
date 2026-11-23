@@ -672,6 +672,50 @@
 }
 .promotions-progress .is-current { background: #42613b; }
 
+.cea-newsletter {
+  background: #223127;
+  color: #f5f3e9;
+  border-bottom: 3px solid var(--cea-lime);
+  scroll-margin-top: calc(var(--header-height) + 8px);
+}
+.newsletter-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: clamp(1.5rem, 5vw, 5rem);
+  padding-block: clamp(2rem, 4vw, 3.5rem);
+}
+.store .cea-newsletter h2 { font: 700 clamp(2rem, 4vw, 3.5rem)/1 var(--heading); letter-spacing: -.045em; }
+.newsletter-layout > div > p { color: #dce3d4; max-width: 43ch; margin-top: .65rem; }
+.newsletter-fields { display: flex; gap: .5rem; margin-block: .45rem; }
+.newsletter-fields input {
+  flex: 1 1 10rem;
+  min-width: 0;
+  padding: .7rem .85rem;
+  border: 1px solid #b5c2ae;
+  border-radius: var(--radius);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 1rem;
+}
+.newsletter-panel label { font-weight: 700; }
+.store .newsletter-panel .primary { background: var(--cea-lime); border-color: var(--cea-lime); color: #171c18; font-size: 1rem; }
+.newsletter-panel .primary:hover { filter: brightness(1.08); }
+.newsletter-panel :focus-visible { outline: 2px solid #e5f3a5; outline-offset: 3px; }
+#newsletter-note { color: #d1d9ca; font-size: .875rem; }
+.newsletter-sample { padding: 1rem 1.2rem; border-left: 3px solid var(--cea-lime); background: #f5f3e9; color: var(--ink); }
+.newsletter-sample p:first-child { font-size: .875rem; color: #455841; }
+.newsletter-sample h3 { margin-block: .3rem; font: 700 1.4rem/1.2 var(--heading); }
+.newsletter-sample a { display: inline-block; margin-top: .65rem; font-weight: 700; text-underline-offset: .2em; }
+.newsletter-sample :focus-visible { outline-color: #36562b; }
+@media (max-width: 740px) {
+  .newsletter-layout { grid-template-columns: 1fr; gap: 1.25rem; }
+}
+@media (max-width: 420px) {
+  .newsletter-fields { flex-direction: column; }
+  .newsletter-fields input { flex: auto; }
+}
+
 @supports (height: 100svh) {
   .promotions-stage { --flyer-height: min(49svh, 435px, 94vw); }
 }
